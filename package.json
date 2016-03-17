@@ -1,6 +1,6 @@
 {
   "name": "bcommon",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "commong module for baciro",
   "main": "common.js",
   "scripts": {

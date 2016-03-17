@@ -195,6 +195,12 @@ function showLog (type, msg){
        var file = __stack[1].getFileName();
        console.error(color.red(file + ' ' + func + ':' + line + ' ' + msg));
      break;
+     case 'trace':
+       var line = __stack[1].getLineNumber();
+       var func = __stack[1].getFunctionName();
+       var file = __stack[1].getFileName();
+       console.trace(color.red(file + ' ' + func + ':' + line + ' ' + msg));
+     break;
      default:
        var line = __stack[1].getLineNumber();
        var func = __stack[1].getFunctionName();
