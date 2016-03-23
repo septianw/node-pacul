@@ -1,7 +1,7 @@
 {
   "name": "bcommon",
-  "version": "0.0.4",
-  "description": "commong module for baciro",
+  "version": "0.0.5",
+  "description": "common module for baciro",
   "main": "common.js",
   "scripts": {
     "test": "mocha"
@@ -17,6 +17,7 @@
   "author": "Septian Wibisono",
   "license": "MIT",
   "dependencies": {
-    "bash-color": "0.0.3"
+    "bash-color": "0.0.3",
+    "date-format-lite": "^0.7.4"
   }
 }

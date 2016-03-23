@@ -178,8 +178,12 @@ exports = module.exports.isjson = isjson;
  */
 function showLog (type, msg){
   var color = require('bash-color');
+  require('date-format-lite');
+  Date.masks.default = 'YYYY-MM-DD hh:mm:ss.SS Z'
+  var d = new Date;
 
   Object.defineProperty(global, '__stack', {
+    configurable: true,
     get: function(){
       var orig = Error.prepareStackTrace;
       Error.prepareStackTrace = function(_, stack){ return stack; };
@@ -191,37 +195,39 @@ function showLog (type, msg){
     }
   });
 
-  Object.defineProperty(global, '__line', {
-    get: function(){
-      return __stack[1].getLineNumber();
-    }
-  });
-  Object.defineProperty(global, '__func', {
-    get: function(){
-      return __stack[1].getFunctionName();
-    }
-  });
-  Object.defineProperty(global, '__file', {
-    get: function(){
-      return __stack[1].getFileName();
-    }
-  });
+  var file = __stack[1].getFileName();
+  var func = __stack[1].getFunctionName();
+  var line = __stack[1].getLineNumber();
 
   switch (type) {
-     case 'info':
-       console.info(color.green(msg));
-     break;
-     case 'debug':
-       console.log(color.blue(__file + ' ' + __func + ':' + __line + ' ' + msg));
-     break;
-     case 'error':
-       console.error(color.red(__file + ' ' + __func + ':' + __line + ' ' + msg));
-     break;
-     case 'trace':
-       console.trace(color.red(__file + ' ' + __func + ':' + __line + ' ' + msg));
-     break;
-     default:
-       console.log(color.blue(__file + ' ' + __func + ':' + __line + ' ' + msg));
+    case 'info':
+      if ((process.env.NODE_ENV == 'production') ||
+        (process.env.NODE_ENV == 'development') ||
+        (process.env.NODE_ENV == 'test')) {
+          console.info(color.green(d.format() + ' ' + msg));
+        }
+    break;
+    case 'debug':
+      if ((process.env.NODE_ENV == 'development') ||
+        (process.env.NODE_ENV == 'test')) {
+          console.log(color.blue(d.format() + ' ' + file + ' ' + func + ':' + line + ' ' + msg));
+        }
+    break;
+    case 'error':
+      if ((process.env.NODE_ENV == 'production') ||
+        (process.env.NODE_ENV == 'development') ||
+        (process.env.NODE_ENV == 'test')) {
+          console.error(color.red(d.format() + ' ' + file + ' ' + func + ':' + line + ' ' + msg));
+        }
+    break;
+    case 'trace':
+      if ((process.env.NODE_ENV == 'development') ||
+        (process.env.NODE_ENV == 'test')) {
+          console.trace(color.red(d.format() + ' ' + file + ' ' + func + ':' + line + ' ' + msg));
+        }
+    break;
+    default:
+      console.log(color.blue(d.format() + ' ' + file + ' ' + func + ':' + line + ' ' + msg));
   }
 }
 module.exports.showLog = showLog;
