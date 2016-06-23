@@ -4,46 +4,25 @@
 */
 
 /**
- * Fungsi chmod
- * Fungsi ini bertindak sebagai penyederhana fungsi fs.chmod
- * @param  {string} file    file yang akan dirubah modenya
- * @param  {octal}  mode    mode perubahan
- * @param  {string} message pesan yang akan tampil ketika berhasil
- */
-function chmod (file, mode, message) {
-    var fs = require('fs');
-    fs.chmod(file, mode, function(err) {
-        if (err) { console.log(err) }
-        else if (typeof message !== 'undefined') {
-            console.log(message);
-        }
-    });
-};
-exports = module.exports.chmod = chmod;
-
-/**
- * Fungsi generate random string
- *
- * Fungsi ini akan generate string acak, secara default
- * fungsi ini akan membuat string sepanjang 48 byte.
- *
- * @param  {integer} length integer length of string in byte
- * @return {string}         random string in specified length
- */
-function genrandkey (length) {
-  var crypto = require('crypto');
-  if ( typeof(length) == "undefined" ) { length = 63; }
-  return crypto.randomBytes(length).toString('hex');
-}
-exports = module.exports.genrandkey = genrandkey;
-
-/**
  * showStatus
  *
- * show status of transaction
+ * show status of transaction.
  *
- * @param   {integer}   code    kode status
- * @param   {string}    message Pesan yang akan ditampilkan ke status
+ * Status code consist of:
+ *
+ * | Code | Status |
+ * | ---- | ------ |
+ * | 1 | success |
+ * | 2 | sent |
+ * | 3 | corrupt |
+ * | 4 | queueing |
+ * | 5 | fail |
+ * | 6 | created |
+ * | 7 | forbidden |
+ * | 9 | unknown error |
+ *
+ * @param   {integer}   code    Status code
+ * @param   {string}    message Message shown to status
  *
  * @return  {object}    object  json object of status
  */
@@ -83,7 +62,7 @@ exports = module.exports.genrandkey = genrandkey;
 
       case 7:
         status.code = code;
-        status.status = 'Forbidden';
+        status.status = 'forbidden';
       break;
 
       default:
@@ -95,13 +74,12 @@ exports = module.exports.genrandkey = genrandkey;
   // console.log(status);
   return status;
 }
-exports = module.exports.showStatus = showStatus;
 
 /**
  * Fungsi ini akan menguji object, apakah object tersebut kosong atau tidak.
  *
- * @param   {Object}  obj Object yang akan diuji
- * @returns {Boolean} Nilai balik berupa boolean, true bila kosong, atau false bila tidak.
+ * @param   {Object}  obj Tested Object
+ * @returns {Boolean} boolean return value, true if empty, or false otherwise.
  */
 function isEmptyObject(obj) {
   for (var key in obj) {
@@ -111,12 +89,11 @@ function isEmptyObject(obj) {
   }
   return true;
 }
-exports = module.exports.isEmptyObject = isEmptyObject;
 
 /**
  * Find unique content of object
  *
- * @param   {Object} a Asserted object
+ * @param   {Object} an Asserted object
  * @returns {Object} Unique result object
  */
 function uniq(a) {
@@ -133,10 +110,10 @@ function uniq(a) {
     }
     return out;
 }
-exports = module.exports.uniq = uniq;
 
 /**
  * Change string to namespace
+ * change path like this "/path/to/some/file.js" into path.to.some.file
  *
  * @param   {String} name      Separated string
  * @param   {String} separator Separator of string
@@ -152,8 +129,7 @@ function namespace (name, separator, container, val){
         o = o[ns[i]] = o[ns[i]] || v;
   }
   return o;
-};
-exports = module.exports.namespace = namespace;
+}
 
 /**
  * Function to check if input object is json or not
@@ -168,26 +144,25 @@ function isjson (obj) {
   }
   return true;
 }
-exports = module.exports.isjson = isjson;
 
 /**
- * Show log to console depend on config level.
- * @param  String   type Type of log, it can be info, error, or debug.
- * @param  String   msg  Message that want to shown on console.
- * @return String        String shown to console.
- */
+* Show log to console depend on config level.
+* @param  String   type Type of log, it can be info, error, or debug.
+* @param  String   msg  Message that want to shown on console.
+* @return String        String shown to console.
+*/
 function showLog (type, msg){
   var color = require('bash-color');
   require('date-format-lite');
-  Date.masks.default = 'YYYY-MM-DD hh:mm:ss.SS Z'
-  var d = new Date;
+  Date.masks.default = 'YYYY-MM-DD hh:mm:ss.SS Z';
+  var d = new Date();
 
   Object.defineProperty(global, '__stack', {
     configurable: true,
     get: function(){
       var orig = Error.prepareStackTrace;
       Error.prepareStackTrace = function(_, stack){ return stack; };
-      var err = new Error;
+      var err = new Error();
       Error.captureStackTrace(err, arguments.callee);
       var stack = err.stack;
       Error.prepareStackTrace = orig;
@@ -230,4 +205,35 @@ function showLog (type, msg){
       console.log(color.blue(d.format() + ' ' + file + ' ' + func + ':' + line + ' ' + msg));
   }
 }
-module.exports.showLog = showLog;
+
+function log_debug(message) {
+  showLog('debug', message);
+}
+function log_error(message) {
+  showLog('error', message);
+}
+function log_info(message) {
+  showLog('info', message);
+}
+function log_trace(message) {
+  showLog('trace', message);
+}
+
+exports = module.exports.showStatus = showStatus;
+
+exports = module.exports.isEmptyObject = isEmptyObject;
+
+exports = module.exports.uniq = uniq;
+
+exports = module.exports.isJson = isjson;
+
+exports = module.exports.showLog = showLog;
+
+exports = module.exports.namespace = namespace;
+
+exports = module.exports.log = {
+  debug: log_debug,
+  error: log_error,
+  info: log_info,
+  trace: log_trace
+};
